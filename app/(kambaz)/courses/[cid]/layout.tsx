@@ -16,12 +16,12 @@ export default async function CoursesLayout({
       <table>
         <tbody>
           <tr>
-            <td valign="top" width="200">
-              <CourseNavigation cid={cid} />
-            </td>
-            <td valign="top" width="100%">
-              {children}
-            </td>
+            <div className="flex gap-4">
+              <div className="hidden w-[140px] shrink-0 md:block">
+                <CourseNavigation cid={cid} />
+              </div>
+              <div className="min-w-0 flex-1">{children}</div>
+            </div>
           </tr>
         </tbody>
       </table>
