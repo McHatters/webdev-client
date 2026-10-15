@@ -8,10 +8,6 @@ export default function AnchorTag() {
       </a>{" "}
       to get dummy text
       <br />
-      <a href="https://github.com/jannunzi" id="wd-github">
-        GitHub
-      </a>
-      <br />
       <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/table" id="wd-ai-link">
         MDN: table element
       </a>
@@ -21,7 +17,7 @@ export default function AnchorTag() {
         Reddit
       </a>
     <br />
-    <a href="https://github.com/McHatters" id="wd-your-github">
+    <a href="https://github.com/McHatters/webdev-client" id="wd-github">
       My GitHub
     </a>
     </>
