@@ -1,17 +1,26 @@
 import Link from "next/link";
-export default function AssignmentEditor() {
+import * as db from "../../../../database";
+
+export default async function AssignmentEditor({
+    params,
+}: {
+    params: Promise<{ cid: string, aid: string }>;
+}) {
+    const { cid, aid } = await params;
+    const assignment = db.assignments.find((a) => a._id === aid);
     return (
         <div id="wd-assignments-editor" className="min-w-0 w-5xl">
             <div className="ml-3">
                 <label htmlFor="wd-name" className="mb-2 flex flex-wrap items-center justify-between gap-2">Assignment Name</label>
                 <input
                     id="wd-name"
-                    defaultValue="A1 - ENV + HTML"
+                    defaultValue={assignment?.title ?? ""}
                     className="rounded border w-full my-2 py-1.5 pr-3 pl-3 text-base text-gray-800" />
+                <div className="my-2 text-sm text-neutral-500">Assignment id: {aid}</div>
                 <textarea
                     id="wd-description"
                     className="w-full my-4 h-48 rounded-lg border px-4 py-3 resize-y text-gray-800 text-base"
-                    defaultValue="The assignment is available online. Submit a link to the landing page of your website. The landing page should have a navigation bar with links to the other pages of your website. The landing page should also have a footer with your name and the date." />
+                    defaultValue={assignment?.description ?? ""} />
                 <label htmlFor="wd-ai-editor-notes" className="mb-2 flex flex-wrap items-center justify-between gap-2">Sample notes</label>
                 <textarea
                     id="wd-ai-editor-notes"
@@ -28,7 +37,7 @@ export default function AssignmentEditor() {
                         <td>
                             <input
                                 id="wd-points"
-                                defaultValue={100}
+                                defaultValue={assignment?.points ?? 100}
                                 className="rounded border w-full py-1.5 pr-3 pl-3 text-base" />
                         </td>
                     </tr>
@@ -125,7 +134,7 @@ export default function AssignmentEditor() {
                                 <input
                                     type="date"
                                     id="wd-due-date"
-                                    defaultValue="2026-09-30"
+                                    defaultValue={assignment?.due}
                                     className="rounded border w-full py-1.5 pr-3 pl-3 my-2 text-base text-gray-800" />
 
                                 <div className="flex gap-2 my-2">
@@ -134,7 +143,7 @@ export default function AssignmentEditor() {
                                         <input
                                             type="date"
                                             id="wd-available-from"
-                                            defaultValue="2026-09-30"
+                                            defaultValue={assignment?.available}
                                             className="rounded border w-full my-2 py-1.5 pr-3 pl-3 text-base text-gray-800" />
                                     </div>
                                     <div>
@@ -151,14 +160,14 @@ export default function AssignmentEditor() {
                 </tbody>
             </table>
             <div className="flex justify-end gap-1">
-                <Link href={`/courses/1234/assignments/`}
+                <Link href={`/courses/${cid}/assignments`}
                     id="wd-cancel"
                     className="align-end">
                     <button
                         type="button"
                         className="inline-flex items-center gap-1 rounded border px-3 py-1.5 text-sm">Cancel</button>
                 </Link>
-                <Link href={`/courses/1234/assignments/`} id="wd-save">
+                <Link href={`/courses/${cid}/assignments`} id="wd-save">
                     <button
                         type="submit"
                         className="inline-flex items-center gap-1 rounded bg-red-600 px-3 py-1.5 text-sm font-medium text-white"
