@@ -7,6 +7,7 @@ export type Course = (typeof coursesJson)[number];
 
 const emptyCourse: Course = {
   _id: "0",
+  term: "Fall 2023",
   name: "New Course",
   number: "New Number",
   startDate: "2023-09-10",
