@@ -24,7 +24,7 @@ export default function CoursesLayout({
   const enrollments = useEnrollmentsStore((state) => state.enrollments);
 
   const enrolled =
-    !!currentUser &&
+    !currentUser || // so that non-logged in users can see all courses
     enrollments.some(
       (enrollment) =>
         enrollment.user === currentUser._id && enrollment.course === courseId,
