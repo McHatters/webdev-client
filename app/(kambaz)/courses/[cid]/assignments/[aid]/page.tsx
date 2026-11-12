@@ -1,26 +1,70 @@
-import Link from "next/link";
-import * as db from "../../../../database";
+"use client";
 
-export default async function AssignmentEditor({
-    params,
-}: {
-    params: Promise<{ cid: string, aid: string }>;
-}) {
-    const { cid, aid } = await params;
-    const assignment = db.assignments.find((a) => a._id === aid);
+import { useState } from "react";
+import Link from "next/link";
+import { useParams, useRouter } from "next/navigation";
+import {
+    useAssignmentsStore,
+    type Assignment,
+} from "../../../../store/assignmentsStore";
+
+const newAssignment: Omit<Assignment, "_id"> = {
+    title: "New Assignment",
+    course: "",
+    description: "New Assignment Description",
+    points: 100,
+    due: "",
+    available: "",
+    until: "",
+};
+
+export default function AssignmentEditor() {
+    const { cid, aid } = useParams<{ cid: string; aid: string }>();
+    const router = useRouter();
+    const isNew = aid === "new";
+    const existing = useAssignmentsStore((state) => state.findAssignment(aid));
+
+    const found = existing?.course === cid ? existing : undefined;
+    const addAssignment = useAssignmentsStore((state) => state.addAssignment);
+    const updateAssignment = useAssignmentsStore((state) => state.updateAssignment);
+    const [assignment, setAssignment] = useState<Omit<Assignment, "_id">>(
+        found ?? { ...newAssignment, course: cid },
+    );
+    const listPath = `/courses/${cid}/assignments`;
+
+    const save = () => {
+        if (isNew) {
+            addAssignment({ ...assignment, course: cid });
+        } else {
+            updateAssignment({ ...assignment, _id: aid, course: cid });
+        }
+        router.push(listPath);
+    };
+
+    if (!isNew && !found) {
+        return (
+            <div id="wd-assignments-editor">
+                <p>Assignment not found in this course.</p>
+                <Link href={listPath}>Back to Assignments</Link>
+            </div>
+        );
+    }
+
     return (
         <div id="wd-assignments-editor" className="min-w-0 w-5xl">
             <div className="ml-3">
                 <label htmlFor="wd-name" className="mb-2 flex flex-wrap items-center justify-between gap-2">Assignment Name</label>
                 <input
                     id="wd-name"
-                    defaultValue={assignment?.title ?? ""}
+                    value={assignment.title}
+                    onChange={(e) => setAssignment({ ...assignment, title: e.target.value })}
                     className="rounded border w-full my-2 py-1.5 pr-3 pl-3 text-base text-gray-800" />
                 <div className="my-2 text-sm text-neutral-500">Assignment id: {aid}</div>
                 <textarea
                     id="wd-description"
                     className="w-full my-4 h-48 rounded-lg border px-4 py-3 resize-y text-gray-800 text-base"
-                    defaultValue={assignment?.description ?? ""} />
+                    value={assignment.description}
+                    onChange={(e) => setAssignment({ ...assignment, description: e.target.value })} />
                 <label htmlFor="wd-ai-editor-notes" className="mb-2 flex flex-wrap items-center justify-between gap-2">Sample notes</label>
                 <textarea
                     id="wd-ai-editor-notes"
@@ -37,7 +81,9 @@ export default async function AssignmentEditor({
                         <td>
                             <input
                                 id="wd-points"
-                                defaultValue={assignment?.points ?? 100}
+                                type="number"
+                                value={assignment.points}
+                                onChange={(e) => setAssignment({ ...assignment, points: Number(e.target.value) })}
                                 className="rounded border w-full py-1.5 pr-3 pl-3 text-base" />
                         </td>
                     </tr>
@@ -134,7 +180,8 @@ export default async function AssignmentEditor({
                                 <input
                                     type="date"
                                     id="wd-due-date"
-                                    defaultValue={assignment?.due}
+                                    value={assignment.due}
+                                    onChange={(e) => setAssignment({ ...assignment, due: e.target.value })}
                                     className="rounded border w-full py-1.5 pr-3 pl-3 my-2 text-base text-gray-800" />
 
                                 <div className="flex gap-2 my-2">
@@ -143,7 +190,8 @@ export default async function AssignmentEditor({
                                         <input
                                             type="date"
                                             id="wd-available-from"
-                                            defaultValue={assignment?.available}
+                                            value={assignment.available}
+                                            onChange={(e) => setAssignment({ ...assignment, available: e.target.value })}
                                             className="rounded border w-full my-2 py-1.5 pr-3 pl-3 text-base text-gray-800" />
                                     </div>
                                     <div>
@@ -151,6 +199,8 @@ export default async function AssignmentEditor({
                                         <input
                                             type="date"
                                             id="wd-available-until"
+                                            value={assignment.until ?? ""}
+                                            onChange={(e) => setAssignment({ ...assignment, until: e.target.value })}
                                             className="rounded border w-full my-2 py-1.5 pr-3 pl-3 text-base text-gray-800" />
                                     </div>
                                 </div>
@@ -160,19 +210,17 @@ export default async function AssignmentEditor({
                 </tbody>
             </table>
             <div className="flex justify-end gap-1">
-                <Link href={`/courses/${cid}/assignments`}
+                <button
+                    type="button"
                     id="wd-cancel"
-                    className="align-end">
-                    <button
-                        type="button"
-                        className="inline-flex items-center gap-1 rounded border px-3 py-1.5 text-sm">Cancel</button>
-                </Link>
-                <Link href={`/courses/${cid}/assignments`} id="wd-save">
-                    <button
-                        type="submit"
-                        className="inline-flex items-center gap-1 rounded bg-red-600 px-3 py-1.5 text-sm font-medium text-white"
-                    >Save</button>
-                </Link>
+                    onClick={() => router.push(listPath)}
+                    className="inline-flex items-center gap-1 rounded border px-3 py-1.5 text-sm">Cancel</button>
+                <button
+                    type="button"
+                    id="wd-save"
+                    onClick={save}
+                    className="inline-flex items-center gap-1 rounded bg-red-600 px-3 py-1.5 text-sm font-medium text-white"
+                >Save</button>
             </div>
         </div>
     );

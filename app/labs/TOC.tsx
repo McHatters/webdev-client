@@ -1,5 +1,6 @@
 "use client";
 
+import "@/app/labs/lab2/tailwind/utilities.css";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
